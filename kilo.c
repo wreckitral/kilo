@@ -16,11 +16,11 @@ int main()
     {
         if (iscntrl(c))
         {
-            printf("%d\n", c);
+            printf("%d\r\n", c);
         }
         else 
         {
-            printf("%d ('%c')\n", c, c);
+            printf("%d ('%c')\r\n", c, c);
         }
     }
     return 0;
@@ -33,6 +33,7 @@ void enableRawMode()
     
     struct termios raw = orig_termios; // assigned orig_termios to raw to make a copy of it
     raw.c_iflag &= ~(ICRNL | IXON);
+    raw.c_oflag &= ~(OPOST);
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); 
     // ECHO is a bitflag, therefore this bit operation flipped the bits to be 00000000000000000000000000000000
     // ICANON is not an input flag, its a "local" flag in the c_lflag field, 
