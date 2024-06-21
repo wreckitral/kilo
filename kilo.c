@@ -1,3 +1,5 @@
+/*** include ***/
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,10 +7,17 @@
 #include <unistd.h>
 #include <errno.h>
 
+/*** data ***/
+
 struct termios orig_termios; // saves terminal original's attribute'
+
+/*** terminal ***/
+
 void enableRawMode();
 void disableRawMode();
 void die(const char *s);
+
+/*** init ***/
 
 int main()
 {
