@@ -13,7 +13,11 @@
 
 /*** data ***/
 
-struct termios orig_termios; // saves terminal original's attribute'
+struct editorConfig {
+    struct termios orig_termios; // saves terminal original's attribute'
+};
+
+struct editorConfig E; 
 
 /*** funtion declaration ***/
 
@@ -43,10 +47,10 @@ int main()
 
 void enableRawMode() 
 {
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1) die("tcsetattr");
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios) == -1) die("tcsetattr");
     atexit(disableRawMode); // called when the program exits
     
-    struct termios raw = orig_termios; // assigned orig_termios to raw to make a copy of it
+    struct termios raw = E.orig_termios; // assigned orig_termios to raw to make a copy of it
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
     raw.c_oflag &= ~(OPOST);
     raw.c_cflag |= (CS8);
@@ -63,10 +67,8 @@ void enableRawMode()
 
 void disableRawMode() 
 {
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
-    {
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios) == -1)
         die("tcsetattr");
-    }
 }
 
 void die(const char *s) 
