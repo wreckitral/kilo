@@ -15,13 +15,14 @@
 
 struct termios orig_termios; // saves terminal original's attribute'
 
-/*** terminal ***/
+/*** funtion declaration ***/
 
 void enableRawMode();
 void disableRawMode();
 void die(const char *s);
 char editorReadKey();
 void editorProcessKeypresses();
+void editorRefreshScreen();
 
 /*** init ***/
 
@@ -31,10 +32,13 @@ int main()
 
     while (1) 
     {
+        editorRefreshScreen();
         editorProcessKeypresses();
     }
     return 0;
 } 
+
+/*** terminal ***/
 
 void enableRawMode() 
 {
@@ -93,4 +97,12 @@ void editorProcessKeypresses()
             exit(0);
             break;
     }
+}
+
+/*** output ***/
+
+void editorRefreshScreen()
+{
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+    write(STDOUT_FILENO, "\x1b[H", 3);
 }
