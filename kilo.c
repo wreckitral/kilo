@@ -15,6 +15,8 @@
 /*** data ***/
 
 struct editorConfig {
+    int screenrows;
+    int screencols;
     struct termios orig_termios; // saves terminal original's attribute'
 };
 
@@ -26,15 +28,22 @@ void enableRawMode();
 void disableRawMode();
 void die(const char *s);
 char editorReadKey();
+int getWindowsSize(int *rows, int *cols);
 void editorProcessKeypresses();
 void editorRefreshScreen();
 void editorDrawRows();
 
 /*** init ***/
 
+void initEditor() 
+{
+    if (getWindowsSize(&E.screenrows, &E.screencols) == -1) die("getWindowsSize");
+}
+
 int main()
 {
     enableRawMode();
+    initEditor();
 
     while (1) 
     {
@@ -43,6 +52,7 @@ int main()
     }
     return 0;
 } 
+
 
 /*** terminal ***/
 
@@ -129,7 +139,7 @@ void editorProcessKeypresses()
 void editorDrawRows()
 {
     int y;
-    for (y = 0; y < 24; y++)
+    for (y = 0; y < E.screenrows; y++)
     {
         write(STDOUT_FILENO, "~\r\n", 3);
     }
