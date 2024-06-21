@@ -20,6 +20,8 @@ struct termios orig_termios; // saves terminal original's attribute'
 void enableRawMode();
 void disableRawMode();
 void die(const char *s);
+char editorReadKey();
+void editorProcessKeypresses();
 
 /*** init ***/
 
@@ -29,17 +31,7 @@ int main()
 
     while (1) 
     {
-        char c = '\0';
-        if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) die("read");
-        if (iscntrl(c))
-        {
-            printf("%d\r\n", c);
-        }
-        else 
-        {
-            printf("%d ('%c')\r\n", c, c);
-        }
-        if (c == CTRL_KEY('q')) break;
+        editorProcessKeypresses();
     }
     return 0;
 } 
@@ -76,4 +68,29 @@ void die(const char *s)
 {
     perror(s);
     exit(1);
+}
+
+char editorReadKey() 
+{
+    int nread;
+    char c;
+    while ((nread = read(STDIN_FILENO, &c, 1)) != 1)
+    {
+        if (nread == -1 && errno != EAGAIN) die("read");
+    }
+
+    return c;
+}
+
+/*** input ***/
+
+void editorProcessKeypresses()
+{
+    char c = editorReadKey();
+
+    switch (c) {
+        case CTRL_KEY('q'):
+            exit(0);
+            break;
+    }
 }
