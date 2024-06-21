@@ -33,7 +33,7 @@ void enableRawMode()
     
     struct termios raw = orig_termios; // assigned orig_termios to raw to make a copy of it
     raw.c_iflag &= ~(IXON);
-    raw.c_lflag &= ~(ECHO | ICANON | ISIG); 
+    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); 
     // ECHO is a bitflag, therefore this bit operation flipped the bits to be 00000000000000000000000000000000
     // ICANON is not an input flag, its a "local" flag in the c_lflag field, 
     // so now the program will quit when 'q' was pressed.
