@@ -32,8 +32,9 @@ void enableRawMode()
     atexit(disableRawMode); // called when the program exits
     
     struct termios raw = orig_termios; // assigned orig_termios to raw to make a copy of it
-    raw.c_iflag &= ~(ICRNL | IXON);
+    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
     raw.c_oflag &= ~(OPOST);
+    raw.c_cflag |= (CS8);
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); 
     // ECHO is a bitflag, therefore this bit operation flipped the bits to be 00000000000000000000000000000000
     // ICANON is not an input flag, its a "local" flag in the c_lflag field, 
