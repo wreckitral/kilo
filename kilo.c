@@ -18,6 +18,7 @@
 
 struct editorConfig 
 {
+    int cx, cy;
     int screenrows;
     int screencols;
     struct termios orig_termios; // saves terminal original's attribute'
@@ -52,6 +53,9 @@ void abAppend(struct abuf *ab, const char *s, int len);
 
 void initEditor() 
 {
+    E.cx = 0;
+    E.cy = 0;
+
     if (getWindowsSize(&E.screenrows, &E.screencols) == -1) die("getWindowsSize");
 }
 
@@ -175,6 +179,25 @@ void abFree(struct abuf *ab)
 
 /*** input ***/
 
+void editorMoveCursor(char key)
+{
+    switch (key) 
+    {
+        case 'a':
+            E.cx--;
+            break;
+        case 'd':
+            E.cx++;
+            break;
+        case 'w':
+            E.cy--;
+            break;
+        case 's':
+            E.cy++;
+            break;
+    }
+}
+
 void editorProcessKeypresses()
 {
     char c = editorReadKey();
@@ -184,6 +207,13 @@ void editorProcessKeypresses()
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
             exit(0);
+            break;
+
+        case 'w':
+        case 's':
+        case 'a':
+        case 'd':
+            editorMoveCursor(c);
             break;
     }
 }
@@ -199,9 +229,9 @@ void editorDrawRows(struct abuf *ab)
         {
             char welcome[80];
             int welcomelen = snprintf(welcome, sizeof(welcome), 
-                    "kilo editor -- version %s", KILO_VERSION);
+                "kilo editor -- version %s", KILO_VERSION);
             if (welcomelen > E.screencols) welcomelen = E.screencols;
-            int padding = (E.screencols- welcomelen) / 2;
+            int padding = (E.screencols - welcomelen) / 2;
             if (padding)
             {
                 abAppend(ab, "~", 1);
@@ -232,8 +262,11 @@ void editorRefreshScreen()
 
     editorDrawRows(&ab);
 
-    abAppend(&ab, "\x1b[H", 3);
-    abAppend(&ab, "\x1b[?25l", 6);
+    char buf[32];
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
+    abAppend(&ab, buf, strlen(buf));
+
+    abAppend(&ab, "\x1b[?25h", 6);
 
     write(STDOUT_FILENO, ab.b, ab.len);
     abFree(&ab);
